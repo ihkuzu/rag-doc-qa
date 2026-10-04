@@ -114,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
     ask = sub.add_parser("ask", parents=[db], help="answer a question from the indexed documents")
     ask.add_argument("question")
     ask.add_argument("-k", type=int, default=4, help="passages given to the model")
-    ask.add_argument("--llm", choices=["ollama"], help="defaults to $RAGQA_LLM")
+    ask.add_argument("--llm", choices=["ollama", "gemini"], help="defaults to $RAGQA_LLM")
     ask.add_argument("--model", help="defaults to $RAGQA_MODEL")
     ask.set_defaults(func=_cmd_ask)
 
