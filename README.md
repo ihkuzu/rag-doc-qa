@@ -8,7 +8,7 @@ are relevant to a question, and lets a language model answer using only those
 passages, with the page it relied on.
 
 **Status: work in progress.** Ingestion, retrieval, cited answers and a
-retrieval evaluation work; packaging with Docker is next.
+retrieval evaluation work, and everything runs with Docker.
 
 ## Roadmap
 
@@ -19,7 +19,7 @@ retrieval evaluation work; packaging with Docker is next.
 - [x] Question answering with source citations (CLI and FastAPI)
 - [x] Evaluation set: measure how often the right passage is retrieved
 - [ ] Compare the offline embedder with a sentence embedding model
-- [ ] Docker setup and CI
+- [x] Docker setup and CI
 
 ## Getting started
 
@@ -31,25 +31,40 @@ pytest
 ```
 
 The tests start a temporary Postgres with pgvector through the `pgserver`
-package, so no database setup is needed to run them.
+package, so no database setup is needed to run them. Set `TEST_DATABASE_URL` to
+use an existing server instead (this is what CI does).
 
-### Try it on your own PDFs
-
-Start a Postgres with pgvector (a compose file will follow):
+### Run everything with Docker
 
 ```bash
-docker run -d --name ragqa-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres pgvector/pgvector:pg16
-export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
+docker compose up -d --build
+docker compose exec api python -m ragqa ingest data/sample
+curl -X POST localhost:8100/ask -H 'content-type: application/json' \
+  -d '{"question": "how many vacation days do employees get?"}'
 ```
 
-Index some PDFs and search them:
+This starts Postgres with pgvector (`ragqa-db`, host port 5433) and the API
+(`ragqa-api`, host port 8100). The ports are chosen so they do not clash with a
+Postgres or a dev server you may already run. Answers need a model, see below:
+the container reaches Ollama on your machine through `host.docker.internal`.
+
+To index your own PDFs, put them into `data/pdfs/` and run
+`docker compose exec api python -m ragqa ingest data/pdfs`.
+
+Stop everything with `docker compose down`, add `-v` to delete the indexed data too.
+
+### Run it without Docker for the API
+
+Start only the database and point the CLI at it:
 
 ```bash
+docker compose up -d db
+export DATABASE_URL=postgresql://postgres:ragqa@localhost:5433/ragqa
 python -m ragqa ingest data/pdfs
 python -m ragqa search "how often must the pump be inspected?" -k 3
 ```
 
-Look at how the documents are split before indexing:
+Look at how documents are split before indexing:
 
 ```bash
 python -m ragqa chunks data/pdfs --max-chars 800 --overlap 150 --show 2
@@ -160,6 +175,8 @@ src/ragqa/
   api.py         FastAPI app
   evaluation.py  hit rate and MRR on a question set
   cli.py         command line
+Dockerfile, docker-compose.yml
+.github/workflows/ci.yml   tests on 3.10 and 3.12, plus a Docker smoke test
 data/
   sample/        fictional PDFs for the demo and the evaluation
   eval/          questions with expected pages
