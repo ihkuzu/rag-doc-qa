@@ -185,3 +185,7 @@ data/
 scripts/         regenerates the sample PDFs
 tests/
 ```
+
+## License
+
+MIT, see [LICENSE](LICENSE).
