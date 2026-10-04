@@ -7,8 +7,8 @@ PDFs into passages, stores them in a vector index, retrieves the passages that
 are relevant to a question, and lets a language model answer using only those
 passages, with the page it relied on.
 
-**Status: work in progress.** Ingestion, retrieval and cited answers work;
-evaluation is next.
+**Status: work in progress.** Ingestion, retrieval, cited answers and a
+retrieval evaluation work; packaging with Docker is next.
 
 ## Roadmap
 
@@ -17,7 +17,8 @@ evaluation is next.
 - [x] Embeddings and storage in Postgres (pgvector)
 - [x] Semantic search from the command line
 - [x] Question answering with source citations (CLI and FastAPI)
-- [ ] Evaluation set: measure how often the right passage is retrieved
+- [x] Evaluation set: measure how often the right passage is retrieved
+- [ ] Compare the offline embedder with a sentence embedding model
 - [ ] Docker setup and CI
 
 ## Getting started
@@ -104,6 +105,36 @@ served at `/docs`. If the model cannot be reached, `/ask` answers with `502`.
 The index remembers which embedder built it and refuses to mix vectors from
 different models.
 
+## Evaluation
+
+`data/eval/questions.json` holds 30 questions, each with the page that answers
+it. There are two kinds: `keyword` questions reuse words from the document,
+`paraphrase` questions ask the same thing in different words. The documents in
+`data/sample` are fictional (a pump station manual, an employee handbook and an
+IT guide) and can be regenerated with `python scripts/make_sample_docs.py`.
+
+```bash
+python -m ragqa ingest data/sample
+python -m ragqa eval data/eval/questions.json -k 5
+```
+
+`hit@k` is the share of questions where the right page is among the first k
+results, `MRR` is the mean of 1/rank of the right page.
+
+Results with the offline `hashing` embedder (18 pages, 30 questions):
+
+| questions  | hit@1 | hit@3 | hit@5 | MRR  |
+| ---------- | ----- | ----- | ----- | ---- |
+| all        | 0.77  | 0.80  | 0.83  | 0.79 |
+| keyword    | 0.93  | 0.93  | 0.93  | 0.93 |
+| paraphrase | 0.60  | 0.67  | 0.73  | 0.65 |
+
+The hashing embedder only matches shared words, so it does well on keyword
+questions and falls behind when the wording changes ("what do I have to hand
+back when I quit?" should find the equipment return page). A sentence embedding
+model is meant to close that gap. To compare, index into an empty database with
+`RAGQA_EMBEDDER=local` and run the same command.
+
 ## Design notes
 
 - **Chunk size.** Chunks are capped at `max_chars` and built from whole sentences,
@@ -127,6 +158,11 @@ src/ragqa/
   llm.py         model clients (Ollama, Gemini)
   answer.py      retrieval + prompt + citations
   api.py         FastAPI app
+  evaluation.py  hit rate and MRR on a question set
   cli.py         command line
+data/
+  sample/        fictional PDFs for the demo and the evaluation
+  eval/          questions with expected pages
+scripts/         regenerates the sample PDFs
 tests/
 ```
