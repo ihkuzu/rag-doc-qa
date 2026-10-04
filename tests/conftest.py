@@ -44,3 +44,13 @@ def clean_db(db_url):
     with psycopg.connect(db_url, autocommit=True) as conn:
         conn.execute("DROP TABLE IF EXISTS chunks, meta")
     return db_url
+
+
+class FakeLLM:
+    def __init__(self, reply: str = "Thirty days [1]."):
+        self.reply = reply
+        self.calls: list[tuple[str, str]] = []
+
+    def complete(self, system: str, prompt: str) -> str:
+        self.calls.append((system, prompt))
+        return self.reply
