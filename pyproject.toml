@@ -10,12 +10,17 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "pypdf>=4.0",
+    "psycopg[binary]>=3.1",
 ]
 
 [project.optional-dependencies]
+local = [
+    "sentence-transformers>=3.0",
+]
 dev = [
     "pytest>=8.0",
     "reportlab>=4.0",
+    "pgserver>=0.1.4",
 ]
 
 [tool.setuptools.packages.find]
