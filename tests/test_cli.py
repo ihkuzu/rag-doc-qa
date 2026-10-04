@@ -41,3 +41,34 @@ def test_search_without_a_database_url_exits(monkeypatch):
         assert "DATABASE_URL" in str(exit_)
     else:
         raise AssertionError("expected SystemExit")
+
+
+def test_ask_prints_answer_and_marks_cited_sources(pdf_factory, tmp_path, clean_db, capsys, monkeypatch):
+    from conftest import FakeLLM
+
+    pdf_factory("handbook.pdf", ["Employees receive thirty vacation days.", "Backups run nightly."])
+    main(["ingest", str(tmp_path), "--database-url", clean_db])
+    capsys.readouterr()
+    monkeypatch.setattr("ragqa.cli.get_llm", lambda *args: FakeLLM("Thirty days [1]."))
+
+    assert main(["ask", "vacation days for employees", "-k", "2", "--database-url", clean_db]) == 0
+
+    out = capsys.readouterr().out
+    assert "Thirty days [1]." in out
+    assert " * [1] handbook.pdf p.1" in out
+
+
+def test_ask_reports_model_errors(pdf_factory, tmp_path, clean_db, capsys, monkeypatch):
+    from ragqa.llm import LLMError
+
+    class Broken:
+        def complete(self, system, prompt):
+            raise LLMError("model is down")
+
+    pdf_factory("handbook.pdf", ["Employees receive thirty vacation days."])
+    main(["ingest", str(tmp_path), "--database-url", clean_db])
+    capsys.readouterr()
+    monkeypatch.setattr("ragqa.cli.get_llm", lambda *args: Broken())
+
+    assert main(["ask", "vacation", "--database-url", clean_db]) == 1
+    assert "model is down" in capsys.readouterr().out

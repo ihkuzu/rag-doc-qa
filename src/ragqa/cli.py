@@ -4,9 +4,11 @@ import argparse
 import os
 from collections import Counter
 
+from .answer import answer
 from .chunking import chunk_pages
 from .embedders import get_embedder
 from .ingest import ingest, retrieve
+from .llm import LLMError, get_llm
 from .loader import load_path
 from .store import PgVectorStore
 
@@ -59,6 +61,30 @@ def _cmd_search(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_ask(args: argparse.Namespace) -> int:
+    store, embedder = _open_store(args)
+    with store:
+        try:
+            result = answer(args.question, store, embedder, get_llm(args.llm, args.model), args.k)
+        except LLMError as error:
+            print(f"error: {error}")
+            return 1
+    print(result.text)
+    if result.sources:
+        print("\nSources:")
+    for source in result.sources:
+        mark = "*" if source.cited else " "
+        print(f" {mark} [{source.number}] {source.source} p.{source.page} ({source.score:.3f})")
+    return 0
+
+
+def _cmd_serve(args: argparse.Namespace) -> int:
+    import uvicorn
+
+    uvicorn.run("ragqa.api:create_app_from_env", factory=True, host=args.host, port=args.port)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="ragqa")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -84,6 +110,18 @@ def main(argv: list[str] | None = None) -> int:
     search.add_argument("question")
     search.add_argument("-k", type=int, default=5, help="number of results")
     search.set_defaults(func=_cmd_search)
+
+    ask = sub.add_parser("ask", parents=[db], help="answer a question from the indexed documents")
+    ask.add_argument("question")
+    ask.add_argument("-k", type=int, default=4, help="passages given to the model")
+    ask.add_argument("--llm", choices=["ollama"], help="defaults to $RAGQA_LLM")
+    ask.add_argument("--model", help="defaults to $RAGQA_MODEL")
+    ask.set_defaults(func=_cmd_ask)
+
+    serve = sub.add_parser("serve", help="run the HTTP API")
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8000)
+    serve.set_defaults(func=_cmd_serve)
 
     args = parser.parse_args(argv)
     return args.func(args)
