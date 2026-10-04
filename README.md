@@ -20,7 +20,7 @@ everything runs with Docker.
 - [x] Semantic search from the command line
 - [x] Question answering with source citations (CLI and FastAPI)
 - [x] Evaluation set: measure how often the right passage is retrieved
-- [ ] Compare the offline embedder with a sentence embedding model
+- [x] Compare the offline embedder with a sentence embedding model
 - [x] Docker setup and CI
 
 ## Getting started
@@ -149,8 +149,23 @@ Results with the offline `hashing` embedder (18 pages, 30 questions):
 The hashing embedder only matches shared words, so it does well on keyword
 questions and falls behind when the wording changes ("what do I have to hand
 back when I quit?" should find the equipment return page). A sentence embedding
-model is meant to close that gap. To compare, index into an empty database with
+model closes that gap. To compare, index into an empty database with
 `RAGQA_EMBEDDER=local` and run the same command.
+
+Results with the `local` embedder (`all-MiniLM-L6-v2`, same 18 pages and 30
+questions):
+
+| questions  | hit@1 | hit@3 | hit@5 | MRR  |
+| ---------- | ----- | ----- | ----- | ---- |
+| all        | 0.97  | 1.00  | 1.00  | 0.98 |
+| keyword    | 1.00  | 1.00  | 1.00  | 1.00 |
+| paraphrase | 0.93  | 1.00  | 1.00  | 0.96 |
+
+Paraphrase hit@1 goes from 0.60 to 0.93. The one question still not ranked first
+is the "hand back when I quit" one: the right page is third, behind another page
+of the same handbook. The document set is small and fictional, so these numbers
+show the difference between the two embedders, not how the system would do on
+real documents.
 
 ## Design notes
 
