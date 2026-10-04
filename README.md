@@ -1,5 +1,7 @@
 # rag-doc-qa
 
+[![ci](https://github.com/ihkuzu/rag-doc-qa/actions/workflows/ci.yml/badge.svg)](https://github.com/ihkuzu/rag-doc-qa/actions/workflows/ci.yml)
+
 Question answering over PDF documents using retrieval-augmented generation (RAG).
 
 Language models do not know the content of your documents. This project splits
@@ -7,8 +9,8 @@ PDFs into passages, stores them in a vector index, retrieves the passages that
 are relevant to a question, and lets a language model answer using only those
 passages, with the page it relied on.
 
-**Status: work in progress.** Ingestion, retrieval, cited answers and a
-retrieval evaluation work, and everything runs with Docker.
+Ingestion, retrieval, cited answers and a retrieval evaluation work, and
+everything runs with Docker.
 
 ## Roadmap
 
