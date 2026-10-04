@@ -1,0 +1,45 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: ragqa-db
+    environment:
+      POSTGRES_DB: ragqa
+      POSTGRES_PASSWORD: ragqa
+    ports:
+      # 5433 on the host so it does not clash with a local Postgres on 5432
+      - "5433:5432"
+    volumes:
+      - ragqa-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ragqa"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    container_name: ragqa-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:ragqa@db:5432/ragqa
+      RAGQA_EMBEDDER: ${RAGQA_EMBEDDER:-hashing}
+      RAGQA_LLM: ${RAGQA_LLM:-ollama}
+      RAGQA_MODEL: ${RAGQA_MODEL:-}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${API_PORT:-8100}:8000"
+    volumes:
+      - ./data/pdfs:/app/data/pdfs:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  ragqa-data:
