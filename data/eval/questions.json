@@ -1,0 +1,182 @@
+[
+  {
+    "question": "How often must the main hydraulic pump be inspected?",
+    "source": "pump_station_manual.pdf",
+    "page": 1,
+    "kind": "keyword"
+  },
+  {
+    "question": "When are the mechanical seals replaced?",
+    "source": "pump_station_manual.pdf",
+    "page": 2,
+    "kind": "keyword"
+  },
+  {
+    "question": "What happens when the red stop button is pressed?",
+    "source": "pump_station_manual.pdf",
+    "page": 3,
+    "kind": "keyword"
+  },
+  {
+    "question": "What grease is used to lubricate the bearings?",
+    "source": "pump_station_manual.pdf",
+    "page": 4,
+    "kind": "keyword"
+  },
+  {
+    "question": "What vibration reading means the pump has to be taken out of service?",
+    "source": "pump_station_manual.pdf",
+    "page": 5,
+    "kind": "keyword"
+  },
+  {
+    "question": "How many vacation days do full-time employees receive?",
+    "source": "employee_handbook.pdf",
+    "page": 1,
+    "kind": "keyword"
+  },
+  {
+    "question": "How many days per week can employees work remotely?",
+    "source": "employee_handbook.pdf",
+    "page": 2,
+    "kind": "keyword"
+  },
+  {
+    "question": "Before what time must I inform my team lead about sick leave?",
+    "source": "employee_handbook.pdf",
+    "page": 3,
+    "kind": "keyword"
+  },
+  {
+    "question": "How much are meals reimbursed during business trips?",
+    "source": "employee_handbook.pdf",
+    "page": 4,
+    "kind": "keyword"
+  },
+  {
+    "question": "When do the nightly backups run and how long are they kept?",
+    "source": "it_operations_guide.pdf",
+    "page": 1,
+    "kind": "keyword"
+  },
+  {
+    "question": "How many characters must a password have?",
+    "source": "it_operations_guide.pdf",
+    "page": 2,
+    "kind": "keyword"
+  },
+  {
+    "question": "How fast must security incidents be reported to the on-call engineer?",
+    "source": "it_operations_guide.pdf",
+    "page": 3,
+    "kind": "keyword"
+  },
+  {
+    "question": "When is the maintenance window for operating system patches?",
+    "source": "it_operations_guide.pdf",
+    "page": 4,
+    "kind": "keyword"
+  },
+  {
+    "question": "Who approves access requests?",
+    "source": "it_operations_guide.pdf",
+    "page": 5,
+    "kind": "keyword"
+  },
+  {
+    "question": "When is an alert escalated to the team lead?",
+    "source": "it_operations_guide.pdf",
+    "page": 6,
+    "kind": "keyword"
+  },
+  {
+    "question": "Where can I find a replacement impeller?",
+    "source": "pump_station_manual.pdf",
+    "page": 6,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "How long can I carry holiday over into next year?",
+    "source": "employee_handbook.pdf",
+    "page": 1,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "What equipment do new hires get when they start?",
+    "source": "employee_handbook.pdf",
+    "page": 5,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "What do I have to hand back when I quit?",
+    "source": "employee_handbook.pdf",
+    "page": 6,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "Who has to approve starting the pump again after an emergency stop?",
+    "source": "pump_station_manual.pdf",
+    "page": 3,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "How often should the bearings be greased?",
+    "source": "pump_station_manual.pdf",
+    "page": 4,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "At what shaking level must the machine be shut off?",
+    "source": "pump_station_manual.pdf",
+    "page": 5,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "How much dripping is tolerated before a seal needs changing?",
+    "source": "pump_station_manual.pdf",
+    "page": 2,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "Do I need a doctor's note when I am ill?",
+    "source": "employee_handbook.pdf",
+    "page": 3,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "How long do I have to submit my receipts?",
+    "source": "employee_handbook.pdf",
+    "page": 4,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "How long is the trial period for new staff?",
+    "source": "employee_handbook.pdf",
+    "page": 5,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "How long are database copies stored?",
+    "source": "it_operations_guide.pdf",
+    "page": 1,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "Do I have to change my password regularly?",
+    "source": "it_operations_guide.pdf",
+    "page": 2,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "Is two-step login required for accounts that touch production?",
+    "source": "it_operations_guide.pdf",
+    "page": 2,
+    "kind": "paraphrase"
+  },
+  {
+    "question": "How soon are unused accounts switched off?",
+    "source": "it_operations_guide.pdf",
+    "page": 5,
+    "kind": "paraphrase"
+  }
+]
