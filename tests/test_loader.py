@@ -1,6 +1,6 @@
 import pytest
 
-from ragqa.loader import load_directory, load_pdf
+from ragqa.loader import load_directory, load_path, load_pdf
 
 
 def test_load_pdf_returns_text_with_page_numbers(pdf_factory):
@@ -35,3 +35,10 @@ def test_load_directory_rejects_a_file_path(tmp_path):
     file.write_text("x")
     with pytest.raises(NotADirectoryError):
         load_directory(file)
+
+
+def test_load_path_accepts_file_and_directory(pdf_factory, tmp_path):
+    file = pdf_factory("one.pdf", ["Only page."])
+
+    assert len(load_path(file)) == 1
+    assert len(load_path(tmp_path)) == 1
