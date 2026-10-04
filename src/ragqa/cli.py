@@ -7,6 +7,7 @@ from collections import Counter
 from .answer import answer
 from .chunking import chunk_pages
 from .embedders import get_embedder
+from .evaluation import evaluate, format_report, load_questions
 from .ingest import ingest, retrieve
 from .llm import LLMError, get_llm
 from .loader import load_path
@@ -78,6 +79,16 @@ def _cmd_ask(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_eval(args: argparse.Namespace) -> int:
+    questions = load_questions(args.questions)
+    store, embedder = _open_store(args)
+    with store:
+        results = evaluate(questions, store, embedder, args.k)
+    print(f"embedder: {embedder.name}")
+    print(format_report(results, args.k))
+    return 0
+
+
 def _cmd_serve(args: argparse.Namespace) -> int:
     import uvicorn
 
@@ -117,6 +128,11 @@ def main(argv: list[str] | None = None) -> int:
     ask.add_argument("--llm", choices=["ollama", "gemini"], help="defaults to $RAGQA_LLM")
     ask.add_argument("--model", help="defaults to $RAGQA_MODEL")
     ask.set_defaults(func=_cmd_ask)
+
+    evaluation = sub.add_parser("eval", parents=[db], help="measure retrieval quality on a question set")
+    evaluation.add_argument("questions", help="JSON file with questions and expected pages")
+    evaluation.add_argument("-k", type=int, default=5, help="results retrieved per question")
+    evaluation.set_defaults(func=_cmd_eval)
 
     serve = sub.add_parser("serve", help="run the HTTP API")
     serve.add_argument("--host", default="127.0.0.1")

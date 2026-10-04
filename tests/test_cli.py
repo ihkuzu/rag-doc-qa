@@ -72,3 +72,21 @@ def test_ask_reports_model_errors(pdf_factory, tmp_path, clean_db, capsys, monke
 
     assert main(["ask", "vacation", "--database-url", clean_db]) == 1
     assert "model is down" in capsys.readouterr().out
+
+
+def test_eval_prints_a_report(pdf_factory, tmp_path, clean_db, capsys):
+    import json
+
+    pdf_factory("handbook.pdf", ["Backups run nightly.", "Employees receive thirty vacation days."])
+    main(["ingest", str(tmp_path), "--database-url", clean_db])
+    questions = tmp_path / "questions.json"
+    questions.write_text(
+        json.dumps([{"question": "vacation days for employees", "source": "handbook.pdf", "page": 2}])
+    )
+    capsys.readouterr()
+
+    assert main(["eval", str(questions), "-k", "3", "--database-url", clean_db]) == 0
+
+    out = capsys.readouterr().out
+    assert "embedder: hashing-384" in out
+    assert "hit@1 1.00" in out
