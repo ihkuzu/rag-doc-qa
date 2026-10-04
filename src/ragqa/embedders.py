@@ -63,7 +63,7 @@ class SentenceTransformerEmbedder:
 
 
 def get_embedder(name: str | None = None) -> Embedder:
-    name = (name or os.getenv("RAGQA_EMBEDDER", "hashing")).lower()
+    name = (name or os.getenv("RAGQA_EMBEDDER") or "hashing").lower()
     if name == "hashing":
         return HashingEmbedder()
     if name == "local":

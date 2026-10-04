@@ -58,3 +58,8 @@ def test_sentence_transformer_wrapper_uses_the_given_model():
     assert embedder.dimension == 3
     assert embedder.name == "tiny-model-3"
     assert embedder.embed(["a", "b"]) == [[1.0, 0.0, 0.0], [1.0, 0.0, 0.0]]
+
+
+def test_empty_embedder_setting_falls_back_to_hashing(monkeypatch):
+    monkeypatch.setenv("RAGQA_EMBEDDER", "")
+    assert get_embedder().name == "hashing-384"

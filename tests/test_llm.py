@@ -124,3 +124,10 @@ def test_gemini_response_without_text_becomes_llm_error(body):
     llm = GeminiLLM(api_key="k", client=client_with(lambda request: httpx.Response(200, json=body)))
     with pytest.raises(LLMError):
         llm.complete("s", "p")
+
+
+def test_empty_environment_values_fall_back_to_defaults(monkeypatch):
+    monkeypatch.setenv("RAGQA_LLM", "")
+    monkeypatch.setenv("RAGQA_MODEL", "")
+
+    assert get_llm().model == "llama3.2:3b"

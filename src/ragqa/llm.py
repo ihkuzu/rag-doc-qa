@@ -101,9 +101,9 @@ class GeminiLLM:
 
 
 def get_llm(name: str | None = None, model: str | None = None) -> LLM:
-    name = (name or os.getenv("RAGQA_LLM", "ollama")).lower()
+    name = (name or os.getenv("RAGQA_LLM") or "ollama").lower()
     if name == "ollama":
-        return OllamaLLM(model or os.getenv("RAGQA_MODEL", "llama3.2:3b"))
+        return OllamaLLM(model or os.getenv("RAGQA_MODEL") or "llama3.2:3b")
     if name == "gemini":
-        return GeminiLLM(model or os.getenv("RAGQA_MODEL", "gemini-3.8-flash"))
+        return GeminiLLM(model or os.getenv("RAGQA_MODEL") or "gemini-3.8-flash")
     raise ValueError(f"unknown llm: {name}")
