@@ -1,11 +1,3 @@
-"""Split page text into overlapping chunks that respect sentence boundaries.
-
-Retrieval works on chunks, not on whole pages: a chunk has to be small enough
-to be about one thing, but large enough to carry context. Consecutive chunks
-share a little text (the overlap) so an answer that sits on a boundary is not
-cut in half.
-"""
-
 from __future__ import annotations
 
 import re
@@ -20,7 +12,7 @@ _SENTENCE_END = re.compile(r"(?<=[.!?])\s+")
 class Chunk:
     source: str
     page: int
-    index: int  # position of the chunk within its page, starting at 0
+    index: int  # position within the page, from 0
     text: str
 
 
@@ -29,10 +21,10 @@ def _normalize(text: str) -> str:
 
 
 def _split_sentences(text: str, max_chars: int) -> list[str]:
-    """Split into sentences; hard-split any sentence longer than max_chars."""
     pieces: list[str] = []
     for sentence in _SENTENCE_END.split(text):
         sentence = sentence.strip()
+        # an over-long sentence is cut at the last space before the limit
         while len(sentence) > max_chars:
             cut = sentence.rfind(" ", 0, max_chars)
             if cut <= 0:
@@ -45,7 +37,6 @@ def _split_sentences(text: str, max_chars: int) -> list[str]:
 
 
 def _overlap_tail(sentences: list[str], overlap_chars: int) -> list[str]:
-    """Last sentences of a finished chunk, up to overlap_chars in total."""
     tail: list[str] = []
     total = 0
     for sentence in reversed(sentences):
@@ -58,7 +49,6 @@ def _overlap_tail(sentences: list[str], overlap_chars: int) -> list[str]:
 
 
 def chunk_text(text: str, max_chars: int = 800, overlap_chars: int = 150) -> list[str]:
-    """Split text into chunks of at most max_chars characters."""
     if max_chars <= 0:
         raise ValueError("max_chars must be positive")
     if not 0 <= overlap_chars < max_chars:
@@ -85,7 +75,6 @@ def chunk_text(text: str, max_chars: int = 800, overlap_chars: int = 150) -> lis
 def chunk_pages(
     pages: list[Page], max_chars: int = 800, overlap_chars: int = 150
 ) -> list[Chunk]:
-    """Chunk every page, keeping track of where each chunk came from."""
     chunks: list[Chunk] = []
     for page in pages:
         for index, text in enumerate(chunk_text(page.text, max_chars, overlap_chars)):
