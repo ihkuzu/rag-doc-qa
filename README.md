@@ -69,6 +69,20 @@ page numbers (a `*` marks the ones the answer actually refers to). Set
 `RAGQA_MODEL` to use a different Ollama model and `OLLAMA_HOST` if Ollama does
 not run on `localhost:11434`.
 
+### Using a hosted model instead
+
+Gemini works too. Create an API key in Google AI Studio and keep it in your
+environment, never in the repository:
+
+```bash
+export GEMINI_API_KEY=...        # PowerShell: $env:GEMINI_API_KEY = "..."
+export RAGQA_LLM=gemini
+python -m ragqa ask "how many vacation days do employees get?"
+```
+
+On the free tier Google may use prompts to improve its products, so only index
+documents that are not confidential.
+
 ### HTTP API
 
 ```bash
@@ -110,7 +124,7 @@ src/ragqa/
   embedders.py   text -> vectors
   store.py       pgvector storage and search
   ingest.py      loader + chunking + embeddings + store
-  llm.py         model client (Ollama)
+  llm.py         model clients (Ollama, Gemini)
   answer.py      retrieval + prompt + citations
   api.py         FastAPI app
   cli.py         command line
